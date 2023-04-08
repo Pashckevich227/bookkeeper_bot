@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from dateutil.relativedelta import relativedelta
 import datetime
+import json
 
 client = MongoClient()
 
@@ -9,7 +10,7 @@ msg_collection = db["sample_collection"]
 
 
 def correct_time(dt_from, dt_upto):
-    time_format = '%Y-%m-%dT%H:%M:%S'
+    time_format = "%Y-%m-%dT%H:%M:%S"
 
     dt_from = datetime.datetime.strptime(dt_from, time_format)
     dt_upto = datetime.datetime.strptime(dt_upto, time_format)
@@ -20,28 +21,28 @@ def correct_time(dt_from, dt_upto):
 def get_result_month(dt_from, dt_upto):
     result_month = msg_collection.aggregate([
     {
-    '$match': {
-        'dt': {'$gte': dt_from, '$lte': dt_upto}
+    "$match": {
+        "dt": {"$gte": dt_from, "$lte": dt_upto}
     }
     },
     {
-        '$group': {
-            '_id': {
-                '$dateToString': {
-                    'format': '%Y-%m-%dT%H:%M:%S',
-                    'date': {
-                        '$dateFromParts': {
-                            'year': {'$year': '$dt'},
-                            'month': {'$month': '$dt'}
+        "$group": {
+            "_id": {
+                "$dateToString": {
+                    "format": "%Y-%m-%dT%H:%M:%S",
+                    "date": {
+                        "$dateFromParts": {
+                            "year": {"$year": "$dt"},
+                            "month": {"$month": "$dt"}
                         }
                     }
                 }
             },
-            'total_value': {'$sum': '$value'}
+            "total_value": {"$sum": "$value"}
         }
     },
     {
-        '$sort': {'_id': 1}
+        "$sort": {"_id": 1}
     }
 ])
     return result_month
@@ -132,7 +133,6 @@ def difference_date(dt_from, dt_upto, group_type):
     difference_1 = set(correct_date).difference(set(my_data))
     difference_2 = set(my_data).difference(set(correct_date))
     data_difference = list(difference_1.union(difference_2))
-
     return data_difference
 
 
@@ -153,8 +153,8 @@ def dataset(dt_from, dt_upto, group_type):
     dates = []
 
     for item in result:
-        values.append(item['total_value'])
-        dates.append(item['_id'])
+        values.append(item["total_value"])
+        dates.append(item["_id"])
 
     if missing_element:
         for data in missing_element:
@@ -171,4 +171,7 @@ def dataset(dt_from, dt_upto, group_type):
         "dataset": sorted_values,
         "labels": sorted_date
     }
+
+    dataset_dict = json.dumps(dataset_dict).replace("'", '"')
+
     return dataset_dict
