@@ -21,13 +21,5 @@ ____
 Установка:
 `pip install -r requirements.txt`
 ____
-Запуск:
-
-На Windows:
-`python manage.py runserver`
-
-На Linus:
-`python3 manage.py runserver`
-____
 **P.s.** Чтобы протестировать бота, необходимо зарегистрировать нового бота через BotFather, получить его уникальный токен.
 Создайте файл `.env` в рабочем репозитории, в нем напишите `TOKEN_BOT=ваш_токен`. Готово.
